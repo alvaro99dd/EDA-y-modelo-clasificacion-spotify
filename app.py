@@ -5,6 +5,8 @@ import plotly.express as px
 import matplotlib.pyplot as plt
 import seaborn as sns
 import plotly.graph_objects as go
+import urllib.request
+import json
 
 import streamlit.components.v1 as components
 
@@ -192,12 +194,16 @@ elif pestaña == "Predicción de popularidad":
     st.markdown("### Predicción de la popularidad")
     cols = st.columns(3)
     with cols[0]:
-        st.slider("Energía", 0.0, 1.0, 0.5, 0.01)
-        st.slider("Bailabilidad", 0.0, 1.0, 0.5, 0.01)
-        st.slider("Positividad", 0.0, 1.0, 0.5, 0.01)
+        energy = st.slider("Energía", 0.0, 1.0, 0.5, 0.01)
+        danceability = st.slider("Bailabilidad", 0.0, 1.0, 0.5, 0.01)
+        valence = st.slider("Positividad", 0.0, 1.0, 0.5, 0.01)
+    with cols[2]:
+        instrumentalness = st.slider("Instrumentalidad", 0.0, 1.0, 0.5, 0.01)
+        acousticness = st.slider("Acústica", 0.0, 1.0, 0.5, 0.01)
+        liveness = st.slider("En vivo", 0.0, 1.0, 0.5, 0.01)
     with cols[1]:
-        st.slider("Volumen", -60, 0, -20, 1)
-        st.slider("Tempo", 0, 200, 100, 1)
+        loudness = st.slider("Volumen", -60, 0, -20, 1)
+        tempo = st.slider("Tempo", 0, 200, 100, 1)
         m = st.markdown("""
         <style>
         div.stButton > button:first-child {
@@ -205,10 +211,46 @@ elif pestaña == "Predicción de popularidad":
             margin-top: 10px;
         }
         </style>""", unsafe_allow_html=True)
+        b = st.button("Predecir", key="unique_key", use_container_width=True)
+        if b:
+            # Estructura de datos para la solicitud POST
+            data = {
+                "input_data": {
+                    "columns": [
+                        "energy",
+                        "danceability",
+                        "valence",
+                        "loudness",
+                        "tempo",
+                        "instrumentalness",
+                        "acousticness",
+                        "liveness"
+                        ],
+                    "index": [0],
+                    "data": [[energy, danceability, valence, loudness, tempo, instrumentalness, acousticness, liveness]]
+                        }
+                    }
 
-        st.button("Predecir", key="unique_key", use_container_width=True)
-    with cols[2]:
-        st.slider("Instrumentalidad", 0.0, 1.0, 0.5, 0.01)
-        
-        st.slider("Acústica", 0.0, 1.0, 0.5, 0.01)
-        st.slider("En vivo", 0.0, 1.0, 0.5, 0.01)
+            API_KEY = 'xxxxx'
+
+            URL = 'https://upgrademl-tmavv.eastus.inference.ml.azure.com/score'
+
+            # Convertir a JSON
+            body = str.encode(json.dumps(data))
+
+            headers = {
+                'Content-Type': 'application/json',
+                'Authorization': ('Bearer ' + API_KEY)
+                }
+
+            # Crear y enviar la solicitud POST
+            try:
+                req = urllib.request.Request(URL, body, headers)
+                with urllib.request.urlopen(req) as response:
+                    result = json.loads(response.read())
+                    st.write("Precio predicho:")
+                    st.write(result)
+            except urllib.error.HTTPError as error:
+                    st.error(f"Error en la solicitud: {error.code}")
+                    st.write(error.info())
+                    st.write(error.read().decode("utf8", 'ignore'))
