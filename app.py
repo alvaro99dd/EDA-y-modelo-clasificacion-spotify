@@ -26,24 +26,50 @@ def clean_outliers(df_aux, columns: list)->pd.DataFrame:
 
 df = cargar_datos()
 
-st.title("Análisis exploratorio de canciones de Spotify")
-st.sidebar.title("Opciones de la tabla")
-pestaña = st.sidebar.radio("Selecciona una pestaña:", ("Inicio", "Distribución variables", "Popularidad", "Características de la canción", "Informe"))
+st.markdown(
+    """
+    <style>
+    .title {
+        text-align: center;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
 
-st.sidebar.markdown("#")
-st.sidebar.markdown("#")
-st.sidebar.markdown("#")
-st.sidebar.markdown("#")
-st.sidebar.markdown("#")
-# st.sidebar.markdown("![alt text](imagenes\spotify_logo_icon_189218.png)")
-st.sidebar.image("https://cdn.icon-icons.com/icons2/3041/PNG/512/spotify_logo_icon_189218.png")
+
+st.markdown("<h1 class='title'>Análisis de canciones en Spotify</h1>", unsafe_allow_html=True)
+st.divider()
+st.sidebar.markdown("""
+    <img src="https://cdn.icon-icons.com/icons2/3041/PNG/512/spotify_logo_icon_189218.png" 
+         style="display: block; margin-left: auto; margin-right: auto; width: 75%;" 
+         alt="logo spotify">
+    """, unsafe_allow_html=True)
+st.sidebar.title("Secciones")
+pestaña = st.sidebar.radio("Selecciona una opción:", ("Inicio", "Distribución variables", "Popularidad", "Características de la canción", "Informe"))
 
 if pestaña == "Inicio":
     cols = st.columns(2)
     with cols[0]:
-        pass
+        st.markdown("#####", unsafe_allow_html=True)
+        st.markdown("""
+        En este estudio descubriremos cómo crear un nuevo hit ayudándonos de los parámetros que utiliza spotify para clasificar sus canciones.
+
+        ### Objetivo
+        - Analizar las características de las canciones en Spotify.
+        - Identificar las características que hacen que una canción sea popular.
+        - Poder crear un hit utilizando las características analizadas.
+        - **Fuente de datos:** [Kaggle](https://www.kaggle.com/ziriantahirli/million-song-data-analysis-2)
+        
+        
+        ### Secciones
+        - **Distribución de Variables:** Visualiza la distribución de las características principales de las canciones.
+        - **Popularidad:** Explora qué artistas y canciones son los más populares, junto con diversas métricas de popularidad.
+        - **Características de la Canción:** Analiza las características específicas de las canciones, como volumen, tempo, y más.
+        - **Informe:** Accede a un informe interactivo detallado generado con Power BI.
+    """)
     with cols[1]:
-        pass
+        st.image('imagenes/inicio.png', caption="eyeofthehurricane.news",)
 
 elif pestaña == "Distribución variables":
     tabsInicio = st.tabs(["Variables continuas", "Correlación de Spearman"])
@@ -149,7 +175,7 @@ elif pestaña == "Características de la canción":
         st.components.v1.html(html_content, height=500)
         st.image('imagenes/tempobailable.png')  
 elif pestaña == "Informe":
-    codigo_iframe = '''<iframe title="spotify" width="1320" height="1250"
+    codigo_iframe = '''<iframe title="spotify" width="1320" height="700"
     src="https://app.powerbi.com/view?r=eyJrIjoiMTk5Njg1NjYtYWI5OS00OTg4LTg4OGYtOTE4ZGM3OTFlNWUzIiwidCI6IjhhZWJkZGI2LTM0MTgtNDNhMS1hMjU1LWI5NjQxODZlY2M2NCIsImMiOjl9"
     frameborder="0" allowFullScreen="true"></iframe>'''
     components.html(codigo_iframe, width=1320, height=1250)
