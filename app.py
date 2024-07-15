@@ -26,6 +26,7 @@ def clean_outliers(df_aux, columns: list)->pd.DataFrame:
 
 df = cargar_datos()
 
+# Centrar el título
 st.markdown(
     """
     <style>
@@ -40,11 +41,13 @@ st.markdown(
 
 st.markdown("<h1 class='title'>Análisis de canciones en Spotify</h1>", unsafe_allow_html=True)
 st.divider()
+# Icono de Spotify
 st.sidebar.markdown("""
     <img src="https://cdn.icon-icons.com/icons2/3041/PNG/512/spotify_logo_icon_189218.png" 
          style="display: block; margin-left: auto; margin-right: auto; width: 75%;" 
          alt="logo spotify">
     """, unsafe_allow_html=True)
+
 st.sidebar.title("Secciones")
 pestaña = st.sidebar.radio("Selecciona una opción:", ("Inicio", "Distribución variables", "Popularidad", "Características de la canción", "Informe"))
 
@@ -52,6 +55,7 @@ if pestaña == "Inicio":
     cols = st.columns(2)
     with cols[0]:
         st.markdown("#####", unsafe_allow_html=True)
+        # Descripción del proyecto
         st.markdown("""
         En este estudio descubriremos cómo crear un nuevo hit ayudándonos de los parámetros que utiliza spotify para clasificar sus canciones.
 
@@ -86,6 +90,7 @@ elif pestaña == "Popularidad":
 
     tabsPrecio = st.tabs([f"Top Artistas y Canciones", "Bailable", "Género", "Energía", "Positividad"])
     with tabsPrecio[0]:
+        # Grafica de los artistas más populares y su género
         artist_info = df.groupby('artist_name').agg({
             'popularity': 'mean',
             'genre': 'first'  # Concatena géneros únicos
@@ -94,7 +99,7 @@ elif pestaña == "Popularidad":
         top_n_artists = artist_info.sort_values(by='average_popularity', ascending=False).head(numero_artistas)
         top_n_artists['genre'] = top_n_artists['genre'].apply(lambda x: x.capitalize())
 
-        fig = px.treemap(top_n_artists, 
+        fig = px.treemap(top_n_artists,  
                         path=['artist_name'], 
                         values='average_popularity',
                         color='average_popularity', 
@@ -107,10 +112,13 @@ elif pestaña == "Popularidad":
 
         cols = st.columns(2)
         with cols[0]:
+            # Media de la popularidad en base al modo
             st.image('imagenes/modopopularidad.png')
         with cols[1]:
+            # Media de la popularidad en base a la escala de la canción
             st.image('imagenes/escalapopularidad.png')
 
+        # Grafica top canciones más populares y su camino hacia la popularidad
         df_aux = df.sort_values(by='popularity', ascending=False).head(numero_canciones)
         fig = px.parallel_categories(df_aux
                                     ,dimensions=['genre', 'key', 'mode', 'popularity']
@@ -121,22 +129,24 @@ elif pestaña == "Popularidad":
         st.plotly_chart(fig)
 
     with tabsPrecio[1]:
-        # Graficar las canciones más populares y su danceability
+        # Grafica canciones más populares y su bailabilidad
         df_aux = df.sort_values(by='popularity', ascending=False).head(numero_canciones)
         fig = px.area(df_aux, x='track_name', y='danceability', title=f'Top {numero_canciones} canciones con mayor popularidad y su bailabilidad'
                 , hover_data=["artist_name", "popularity"], labels={"danceability": "Bailabilidad", "track_name": "Canción", "artist_name": "Artista", "popularity": "Popularidad"}
                 , markers=True)
         st.plotly_chart(fig)
     with tabsPrecio[2]:
-        #Histograma de popularidad media por género y año
+        # Histograma de popularidad media por género y año
         with open("html/popularidadgeneros.html", "r", encoding="utf-8") as f:
             html_content = f.read()
         st.components.v1.html(html_content, height=700)
     with tabsPrecio[3]:
+        # Histograma de media de la energía en base a la popularidad segun el año
         with open("html/energiapopularidad.html", "r", encoding="utf-8") as f:
             html_content = f.read()
         st.components.v1.html(html_content, height=700)
     with tabsPrecio[4]:
+        # Histograma de media de la positividad en base a la popularidad segun el año
         with open("html/positividadpopularidad.html", "r", encoding="utf-8") as f:
             html_content = f.read()
         st.components.v1.html(html_content, height=700)
@@ -161,16 +171,19 @@ elif pestaña == "Características de la canción":
         fig.update_traces(hovertemplate='Artista: %{label}<br>Número de Canciones: %{value}')
         st.plotly_chart(fig)
     with tabsVecindario[1]:
+        # Histograma de volumen con la energía promedio
         with open("html/volumenenergia.html", "r", encoding="utf-8") as f:
             html_content = f.read()
         st.components.v1.html(html_content, height=700)
 
     with tabsVecindario[2]:
+        # Histograma bailabilidad en base al tempo de las canciones
         with open("html/tempobailable.html", "r", encoding="utf-8") as f:
             html_content = f.read()
         st.components.v1.html(html_content, height=500)
         st.image('imagenes/tempobailable.png')  
 elif pestaña == "Informe":
+    # Power BI
     codigo_iframe = '''<iframe title="spotify" width="1320" height="700"
     src="https://app.powerbi.com/view?r=eyJrIjoiMTk5Njg1NjYtYWI5OS00OTg4LTg4OGYtOTE4ZGM3OTFlNWUzIiwidCI6IjhhZWJkZGI2LTM0MTgtNDNhMS1hMjU1LWI5NjQxODZlY2M2NCIsImMiOjl9"
     frameborder="0" allowFullScreen="true"></iframe>'''
