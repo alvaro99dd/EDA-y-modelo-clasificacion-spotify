@@ -49,7 +49,7 @@ st.sidebar.markdown("""
     """, unsafe_allow_html=True)
 
 st.sidebar.title("Secciones")
-pestaña = st.sidebar.radio("Selecciona una opción:", ("Inicio", "Distribución variables", "Popularidad", "Características de la canción", "Informe"))
+pestaña = st.sidebar.radio("Selecciona una opción:", ("Inicio", "Distribución variables", "Popularidad", "Características de la canción", "Informe", "Predicción de popularidad"))
 
 if pestaña == "Inicio":
     cols = st.columns(2)
@@ -188,3 +188,27 @@ elif pestaña == "Informe":
     src="https://app.powerbi.com/view?r=eyJrIjoiMTk5Njg1NjYtYWI5OS00OTg4LTg4OGYtOTE4ZGM3OTFlNWUzIiwidCI6IjhhZWJkZGI2LTM0MTgtNDNhMS1hMjU1LWI5NjQxODZlY2M2NCIsImMiOjl9"
     frameborder="0" allowFullScreen="true"></iframe>'''
     components.html(codigo_iframe, width=1320, height=1250)
+elif pestaña == "Predicción de popularidad":
+    st.markdown("### Predicción de la popularidad")
+    cols = st.columns(3)
+    with cols[0]:
+        st.slider("Energía", 0.0, 1.0, 0.5, 0.01)
+        st.slider("Bailabilidad", 0.0, 1.0, 0.5, 0.01)
+        st.slider("Positividad", 0.0, 1.0, 0.5, 0.01)
+    with cols[1]:
+        st.slider("Volumen", -60, 0, -20, 1)
+        st.slider("Tempo", 0, 200, 100, 1)
+        m = st.markdown("""
+        <style>
+        div.stButton > button:first-child {
+            background-color: rgb(29, 185, 84);
+            margin-top: 10px;
+        }
+        </style>""", unsafe_allow_html=True)
+
+        st.button("Predecir", key="unique_key", use_container_width=True)
+    with cols[2]:
+        st.slider("Instrumentalidad", 0.0, 1.0, 0.5, 0.01)
+        
+        st.slider("Acústica", 0.0, 1.0, 0.5, 0.01)
+        st.slider("En vivo", 0.0, 1.0, 0.5, 0.01)
