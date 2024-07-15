@@ -86,13 +86,13 @@ elif pestaña == "Popularidad":
 
     tabsPrecio = st.tabs([f"Top Artistas y Canciones", "Bailable", "Género", "Energía", "Positividad"])
     with tabsPrecio[0]:
-        df['genre'] = df['genre'].apply(lambda x: x.capitalize())
         artist_info = df.groupby('artist_name').agg({
             'popularity': 'mean',
             'genre': 'first'  # Concatena géneros únicos
         }).reset_index()
         artist_info.rename(columns={'popularity': 'average_popularity'}, inplace=True)
         top_n_artists = artist_info.sort_values(by='average_popularity', ascending=False).head(numero_artistas)
+        top_n_artists['genre'] = top_n_artists['genre'].apply(lambda x: x.capitalize())
 
         fig = px.treemap(top_n_artists, 
                         path=['artist_name'], 
@@ -107,13 +107,9 @@ elif pestaña == "Popularidad":
 
         cols = st.columns(2)
         with cols[0]:
-            with open("html/modopopularidad.html", "r", encoding="utf-8") as f:
-                html_content = f.read()
-            st.components.v1.html(html_content, height=600)
+            st.image('imagenes/modopopularidad.png')
         with cols[1]:
-            with open("html/escalapopularidad.html", "r", encoding="utf-8") as f:
-                html_content = f.read()
-            st.components.v1.html(html_content, height=600)
+            st.image('imagenes/escalapopularidad.png')
 
         df_aux = df.sort_values(by='popularity', ascending=False).head(numero_canciones)
         fig = px.parallel_categories(df_aux
