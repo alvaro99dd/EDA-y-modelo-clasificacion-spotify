@@ -30,6 +30,13 @@ st.title("Análisis exploratorio de canciones de Spotify")
 st.sidebar.title("Opciones de la tabla")
 pestaña = st.sidebar.radio("Selecciona una pestaña:", ("Inicio", "Distribución variables", "Popularidad", "Características de la canción", "Informe"))
 
+st.sidebar.markdown("#")
+st.sidebar.markdown("#")
+st.sidebar.markdown("#")
+st.sidebar.markdown("#")
+st.sidebar.markdown("#")
+# st.sidebar.markdown("![alt text](imagenes\spotify_logo_icon_189218.png)")
+st.sidebar.image("https://cdn.icon-icons.com/icons2/3041/PNG/512/spotify_logo_icon_189218.png")
 
 if pestaña == "Inicio":
     cols = st.columns(2)
