@@ -268,32 +268,13 @@ elif pestaña == "Predicción de popularidad":
                     "data": [[danceability, energy, loudness, speechiness, acousticness, instrumentalness, valence, tempo]]
                 }
                 }
-                # Entrada de URL de Spotify
-                spotify_url = st.text_input('Introduce la URL de Spotify:')
-
-                if spotify_url:
-                    # Extract the Spotify track ID from the URL
-                    if 'track' in spotify_url:
-                        track_id = spotify_url.split('/')[-1].split('?')[0]
-                        embed_url = f"https://open.spotify.com/embed/track/{track_id}"
-                    elif 'playlist' in spotify_url:
-                        playlist_id = spotify_url.split('/')[-1].split('?')[0]
-                        embed_url = f"https://open.spotify.com/embed/playlist/{playlist_id}"
-                    else:
-                        embed_url = None
-
-                    if embed_url:
-                        # Mostrar el reproductor de Spotify
-                        st.components.v1.iframe(embed_url, width=300, height=380)
-                    else:
-                        st.write("La URL proporcionada no es válida. Asegúrate de que sea una URL de pista o lista de reproducción de Spotify.")
 
 
                 body = str.encode(json.dumps(data))
 
-                url = config['spotify']['url']
+                url = config['azure']['url']
                 # Replace this with the primary/secondary key, AMLToken, or Microsoft Entra ID token for the endpoint
-                api_key = config['spotify']['api_key']
+                api_key = config['azure']['api_key']
                 if not api_key:
                     raise Exception("A key should be provided to invoke the endpoint")
 
@@ -322,14 +303,30 @@ elif pestaña == "Predicción de popularidad":
                     # Print the headers - they include the requert ID and the timestamp, which are useful for debugging the failure
                     print(error.info())
                     print(error.read().decode("utf8", 'ignore'))
-    
-    sp_oauth = SpotifyOAuth(client_id = config['spotify']['client_id'],
-                            client_secret = config['spotify']['client_secret'],
-                            redirect_uri="https://spotifyanalytics.streamlit.app/",
-                            scope="user-library-read")
-    
-    token_info = sp_oauth.get_access_token() # Crear una instancia de Spotify con el token de accesosp = spotipy.Spotify(auth=token_info)
-    
+
+
+
+    sp_oauth = SpotifyOAuth(
+        client_id=config['spotify']['client_id'],
+        client_secret=config['spotify']['client_secret'],
+        redirect_uri=config['spotify']['redirect_uri'],
+        scope=config['spotify']['scope']
+    )
+
+    # Obtener el URL de autorización
+    auth_url = sp_oauth.get_authorize_url()
+
+    # En tu aplicación, redirige al usuario a `auth_url` para que autorice la aplicación
+
+    # Capturar el código de autorización devuelto por Spotify
+    # Este paso suele ser gestionado por una redirección a la URI especificada
+    # Spotify redirigirá a la URI con el parámetro `code` después de que el usuario autorice la aplicación
+
+    # Obtener el token de acceso usando el código de autorización
+
+    token_info = sp_oauth.get_cached_token()
+
+    # Crear una instancia de Spotify usando el token de acceso
     sp = spotipy.Spotify(auth=token_info['access_token'])
     
     
