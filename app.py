@@ -1,23 +1,15 @@
 import streamlit as st
 import pandas as pd
-import numpy as np
 import plotly.express as px
-import matplotlib.pyplot as plt
-import seaborn as sns
-import plotly.graph_objects as go
 import urllib.request
 import os
-from dotenv import load_dotenv
 import ssl
 import json
 import spotipy
-import requests
 from spotipy.oauth2 import SpotifyOAuth
 import toml
-
 import streamlit.components.v1 as components
 
-load_dotenv()
 logo = 'imagenes/spotify.png'
 st.set_page_config(page_title="Spotify", page_icon=logo ,layout="wide") #configuración de la página
 #Funciones
