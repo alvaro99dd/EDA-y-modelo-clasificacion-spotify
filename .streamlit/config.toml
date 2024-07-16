@@ -4,3 +4,11 @@ backgroundColor="#191414"
 secondaryBackgroundColor="#1DB954"
 textColor="#FFFFFF"
 font="sans serif"
+[spotify]
+client_id="6b265d5c6a044fcc895626b68a31f893"
+client_secret="0f886d98cad244d294a504fc28d16b4d"
+redirect_uri="https://spotifyanalytics.streamlit.app/"
+scope="user-library-read"
+[azure]
+api_key="hnMatWQ3K1NpdpDkEIXvR2C6Vj5xdEsQ"
+url="https://proyectofinal-peloe.eastus2.inference.ml.azure.com/score"
