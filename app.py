@@ -238,6 +238,26 @@ elif pestaña == "Predicción de popularidad":
                     "data": [[danceability, energy, loudness, speechiness, acousticness, instrumentalness, valence, tempo]]
                 }
                 }
+                # Entrada de URL de Spotify
+                spotify_url = st.text_input('Introduce la URL de Spotify:')
+
+                if spotify_url:
+                    # Extract the Spotify track ID from the URL
+                    if 'track' in spotify_url:
+                        track_id = spotify_url.split('/')[-1].split('?')[0]
+                        embed_url = f"https://open.spotify.com/embed/track/{track_id}"
+                    elif 'playlist' in spotify_url:
+                        playlist_id = spotify_url.split('/')[-1].split('?')[0]
+                        embed_url = f"https://open.spotify.com/embed/playlist/{playlist_id}"
+                    else:
+                        embed_url = None
+
+                    if embed_url:
+                        # Mostrar el reproductor de Spotify
+                        st.components.v1.iframe(embed_url, width=300, height=380)
+                    else:
+                        st.write("La URL proporcionada no es válida. Asegúrate de que sea una URL de pista o lista de reproducción de Spotify.")
+
 
                 body = str.encode(json.dumps(data))
 
@@ -272,3 +292,10 @@ elif pestaña == "Predicción de popularidad":
                     # Print the headers - they include the requert ID and the timestamp, which are useful for debugging the failure
                     print(error.info())
                     print(error.read().decode("utf8", 'ignore'))
+
+
+
+                
+
+        
+                
