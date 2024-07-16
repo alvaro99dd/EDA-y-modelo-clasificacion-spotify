@@ -6,6 +6,8 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import plotly.graph_objects as go
 import urllib.request
+import os
+import ssl
 import json
 
 import streamlit.components.v1 as components
@@ -192,65 +194,81 @@ elif pestaña == "Informe":
     components.html(codigo_iframe, width=1320, height=1250)
 elif pestaña == "Predicción de popularidad":
     st.markdown("### Predicción de la popularidad")
-    cols = st.columns(3)
-    with cols[0]:
-        energy = st.slider("Energía", 0.0, 1.0, 0.5, 0.01)
-        danceability = st.slider("Bailabilidad", 0.0, 1.0, 0.5, 0.01)
-        valence = st.slider("Positividad", 0.0, 1.0, 0.5, 0.01)
-    with cols[2]:
-        instrumentalness = st.slider("Instrumentalidad", 0.0, 1.0, 0.5, 0.01)
-        acousticness = st.slider("Acústica", 0.0, 1.0, 0.5, 0.01)
-        liveness = st.slider("En vivo", 0.0, 1.0, 0.5, 0.01)
-    with cols[1]:
-        loudness = st.slider("Volumen", -60, 0, -20, 1)
-        tempo = st.slider("Tempo", 0, 200, 100, 1)
-        m = st.markdown("""
-        <style>
-        div.stButton > button:first-child {
-            background-color: rgb(29, 185, 84);
-            margin-top: 10px;
-        }
-        </style>""", unsafe_allow_html=True)
-        b = st.button("Predecir", key="unique_key", use_container_width=True)
-        if b:
-            # Estructura de datos para la solicitud POST
-            data = {
+    with st.form(key="form"):
+        cols = st.columns(3)
+        with cols[0]:
+            energy = st.slider("Energía", 0.0, 1.0, 0.5, 0.01, key="energy")
+            danceability = st.slider("Bailabilidad", 0.0, 1.0, 0.5, 0.01, key="danceability")
+            valence = st.slider("Positividad", 0.0, 1.0, 0.5, 0.01, key="valence")
+        with cols[2]:
+            instrumentalness = st.slider("Instrumentalidad", 0.0, 1.0, 0.5, 0.01, key="instrumentalness")
+            acousticness = st.slider("Acústica", 0.0, 1.0, 0.5, 0.01, key="acousticness")
+            tempo = st.slider("Tempo", 0.0, 250.0, 120.0, 0.01, key="tempo")
+        with cols[1]:
+            loudness = st.slider("Volumen", -60.0, 0.0, -20.0, 0.01, key="loudness")
+            speechiness = st.slider("Discurso", 0.0, 1.0, 0.5, 0.01, key="speechiness")
+            m = st.markdown("""
+            <style>
+            div.stButton > button:first-child {
+                background-color: rgb(29, 185, 84);
+                margin-top: 10px;
+            }
+            </style>""", unsafe_allow_html=True)
+            b = st.form_submit_button("Predecir", use_container_width=True)
+            if b:
+                def allowSelfSignedHttps(allowed):
+                    if allowed and not os.environ.get('PYTHONHTTPSVERIFY', '') and getattr(ssl, '_create_unverified_context', None):
+                        ssl._create_default_https_context = ssl._create_unverified_context
+
+                allowSelfSignedHttps(True) # this line is needed if you use self-signed certificate in your scoring service.
+
+                data =  {
                 "input_data": {
                     "columns": [
-                        "energy",
                         "danceability",
-                        "valence",
+                        "energy",
                         "loudness",
-                        "tempo",
-                        "instrumentalness",
+                        "speechiness",
                         "acousticness",
-                        "liveness"
+                        "instrumentalness",
+                        "valence",
+                        "tempo"
                         ],
                     "index": [0],
-                    "data": [[energy, danceability, valence, loudness, tempo, instrumentalness, acousticness, liveness]]
-                        }
-                    }
-
-            API_KEY = 'xxxxx'
-
-            URL = 'https://upgrademl-tmavv.eastus.inference.ml.azure.com/score'
-
-            # Convertir a JSON
-            body = str.encode(json.dumps(data))
-
-            headers = {
-                'Content-Type': 'application/json',
-                'Authorization': ('Bearer ' + API_KEY)
+                    "data": [[danceability, energy, loudness, speechiness, acousticness, instrumentalness, valence, tempo]]
+                }
                 }
 
-            # Crear y enviar la solicitud POST
-            try:
-                req = urllib.request.Request(URL, body, headers)
-                with urllib.request.urlopen(req) as response:
+                body = str.encode(json.dumps(data))
+
+                url = 'https://proyectofinal-peloe.eastus2.inference.ml.azure.com/score'
+                # Replace this with the primary/secondary key, AMLToken, or Microsoft Entra ID token for the endpoint
+                api_key = 'hnMatWQ3K1NpdpDkEIXvR2C6Vj5xdEsQ'
+                if not api_key:
+                    raise Exception("A key should be provided to invoke the endpoint")
+
+                # The azureml-model-deployment header will force the request to go to a specific deployment.
+                # Remove this header to have the request observe the endpoint traffic rules
+                headers = {'Content-Type':'application/json', 'Authorization':('Bearer '+ api_key), 'azureml-model-deployment': 'spotifyfinal40-1' }
+
+                req = urllib.request.Request(url, body, headers)
+
+                try:
+                    response = urllib.request.urlopen(req)
+
                     result = json.loads(response.read())
-                    st.write("Popularidad predicha:")
-                    st.write(result)
-            except urllib.error.HTTPError as error:
-                    st.error(f"Error en la solicitud: {error.code}")
-                    st.write(error.info())
-                    st.write(error.read().decode("utf8", 'ignore'))
+                    color = "#1DB954" 
+                    if result[0] == 'Baja popularidad':
+                        color = "#e81434"
+
+                    st.markdown(f"""
+                    <div style='text-align: center; font-size: 20px; margin: 20px 0;'>
+                        <h3>Esta canción tendría una <h3 style='color:{color}'>{result[0].lower()}</h3></h3>
+                    </div>
+                    """, unsafe_allow_html=True)
+                except urllib.error.HTTPError as error:
+                    print("The request failed with status code: " + str(error.code))
+
+                    # Print the headers - they include the requert ID and the timestamp, which are useful for debugging the failure
+                    print(error.info())
+                    print(error.read().decode("utf8", 'ignore'))
