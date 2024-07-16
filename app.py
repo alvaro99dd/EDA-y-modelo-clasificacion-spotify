@@ -26,7 +26,7 @@ def cargar_datos():
     df = pd.read_csv("spotify_data_cleaned.zip", low_memory=False)
     return df
 
-config = toml.load("config.toml")
+config = toml.load(".stramlit/config.toml")
 
 # # @st.cache_data(ttl=3600)
 # def token_spotify():
