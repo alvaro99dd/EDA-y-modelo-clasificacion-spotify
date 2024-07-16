@@ -11,6 +11,7 @@ from dotenv import load_dotenv
 import ssl
 import json
 import spotipy
+import requests
 from spotipy.oauth2 import SpotifyOAuth
 
 import streamlit.components.v1 as components
@@ -23,6 +24,28 @@ st.set_page_config(page_title="Spotify", page_icon=logo ,layout="wide") #configu
 def cargar_datos():
     df = pd.read_csv("spotify_data_cleaned.zip", low_memory=False)
     return df
+
+# # @st.cache_data(ttl=3600)
+# def token_spotify():
+#     # Define los parámetros de la petición
+#     data = {
+#         "grant_type": "authorization_code",
+#         "code": SpotifyOAuth.get_authorization_code(),  # Asegúrate de definir la variable 'code'
+#         "redirect_uri": "https://spotifyanalytics.streamlit.app/",  # Asegúrate de definir la variable 'myurl'
+#         "client_id": os.getenv("client_id"),  # Asegúrate de definir la variable 'myid'
+#         "client_secret": os.getenv("client_secret"),  # Asegúrate de definir la variable 'mysecret'
+#     }
+
+#     # Realiza la petición POST
+#     response = requests.post("https://accounts.spotify.com/api/token", data=data)
+
+#     # Verifica si la petición fue exitosa
+#     if response.status_code == 200:
+#         # Procesa el resultado
+#         result = response.json()
+#         # Maneja el resultado...
+#     else:
+#         print("Error en la petición:", response.status_code)
 
 def clean_outliers(df_aux, columns: list)->pd.DataFrame:
     for column in columns:
@@ -277,10 +300,16 @@ elif pestaña == "Predicción de popularidad":
                     print(error.info())
                     print(error.read().decode("utf8", 'ignore'))
     
-    sp = spotipy.Spotify(auth_manager=SpotifyOAuth(client_id=os.getenv('client_id'),
-                                               client_secret=os.getenv('client_secret'),
-                                               redirect_uri="https://spotifyanalytics.streamlit.app/",
-                                               scope="user-library-read"))
+    sp_oauth = SpotifyOAuth(client_id=os.getenv('client_id'),
+                            client_secret=os.getenv('client_secret'),
+                            redirect_uri="https://spotifyanalytics.streamlit.app/",
+                            scope="user-library-read")
+    
+    token_info = sp_oauth.get_access_token() # Crear una instancia de Spotify con el token de accesosp = spotipy.Spotify(auth=token_info)
+    
+    sp = spotipy.Spotify(auth=token_info['access_token'])
+    
+    
     genres = st.selectbox("Género", sp.recommendation_genre_seeds()["genres"])
     # sp.recommendations(min_danceability= danceability-0.05, max_danceability=danceability+0.05, target_danceability=danceability
     #                    , seed_genres=[genres], limit=5)["tracks"][0]["external_urls"]["spotify"]
