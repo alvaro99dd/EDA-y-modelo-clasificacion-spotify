@@ -13,6 +13,7 @@ import json
 import spotipy
 import requests
 from spotipy.oauth2 import SpotifyOAuth
+import toml
 
 import streamlit.components.v1 as components
 
@@ -24,6 +25,8 @@ st.set_page_config(page_title="Spotify", page_icon=logo ,layout="wide") #configu
 def cargar_datos():
     df = pd.read_csv("spotify_data_cleaned.zip", low_memory=False)
     return df
+
+config = toml.load("config.toml")
 
 # # @st.cache_data(ttl=3600)
 # def token_spotify():
@@ -288,9 +291,9 @@ elif pestaña == "Predicción de popularidad":
 
                 body = str.encode(json.dumps(data))
 
-                url = os.getenv('url')
+                url = config['url']
                 # Replace this with the primary/secondary key, AMLToken, or Microsoft Entra ID token for the endpoint
-                api_key = os.getenv('api_key')
+                api_key = config['api_key']
                 if not api_key:
                     raise Exception("A key should be provided to invoke the endpoint")
 
@@ -320,8 +323,8 @@ elif pestaña == "Predicción de popularidad":
                     print(error.info())
                     print(error.read().decode("utf8", 'ignore'))
     
-    sp_oauth = SpotifyOAuth(client_id=os.getenv('client_id'),
-                            client_secret=os.getenv('client_secret'),
+    sp_oauth = SpotifyOAuth(client_id = config['client_id'],
+                            client_secret = config['client_secret'],
                             redirect_uri="https://spotifyanalytics.streamlit.app/",
                             scope="user-library-read")
     
