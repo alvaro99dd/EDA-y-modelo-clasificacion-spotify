@@ -7,11 +7,15 @@ import seaborn as sns
 import plotly.graph_objects as go
 import urllib.request
 import os
+from dotenv import load_dotenv
 import ssl
 import json
+import spotipy
+from spotipy.oauth2 import SpotifyOAuth
 
 import streamlit.components.v1 as components
 
+load_dotenv()
 logo = 'imagenes/spotify.png'
 st.set_page_config(page_title="Spotify", page_icon=logo ,layout="wide") #configuración de la página
 #Funciones
@@ -261,9 +265,9 @@ elif pestaña == "Predicción de popularidad":
 
                 body = str.encode(json.dumps(data))
 
-                url = 'https://proyectofinal-peloe.eastus2.inference.ml.azure.com/score'
+                url = os.getenv('url')
                 # Replace this with the primary/secondary key, AMLToken, or Microsoft Entra ID token for the endpoint
-                api_key = 'hnMatWQ3K1NpdpDkEIXvR2C6Vj5xdEsQ'
+                api_key = os.getenv('api_key')
                 if not api_key:
                     raise Exception("A key should be provided to invoke the endpoint")
 
@@ -292,10 +296,33 @@ elif pestaña == "Predicción de popularidad":
                     # Print the headers - they include the requert ID and the timestamp, which are useful for debugging the failure
                     print(error.info())
                     print(error.read().decode("utf8", 'ignore'))
+    
+    sp = spotipy.Spotify(auth_manager=SpotifyOAuth(client_id=os.getenv('client_id'),
+                                               client_secret=os.getenv('client_secret'),
+                                               redirect_uri="https://spotifyanalytics.streamlit.app/",
+                                               scope="user-library-read"))
+    genres = st.selectbox("Género", sp.recommendation_genre_seeds()["genres"])
+    # sp.recommendations(min_danceability= danceability-0.05, max_danceability=danceability+0.05, target_danceability=danceability
+    #                    , seed_genres=[genres], limit=5)["tracks"][0]["external_urls"]["spotify"]
 
+    results = sp.recommendations(min_danceability= danceability-0.05, max_danceability=danceability+0.05, target_danceability=danceability
+                                , min_energy=energy-0.05, max_energy=energy+0.05, target_energy=energy
+                                , seed_genres=[genres], limit=4)
 
+    cols = st.columns(4)
+    for i in range(len(results["tracks"])):
+        with cols[i]:
+            spotify_url = results["tracks"][i]["external_urls"]["spotify"]
+            if spotify_url:
+                # Extract the Spotify track ID from the URL
+                if 'track' in spotify_url:
+                    track_id = spotify_url.split('/')[-1].split('?')[0]
+                    embed_url = f"https://open.spotify.com/embed/track/{track_id}"
+                else:
+                    embed_url = None
 
-                
-
-        
-                
+                if embed_url:
+                    # Mostrar el reproductor de Spotify
+                    st.components.v1.iframe(embed_url, width=300, height=380)
+                else:
+                    st.write("La URL proporcionada no es válida. Asegúrate de que sea una URL de pista o lista de reproducción de Spotify.")
