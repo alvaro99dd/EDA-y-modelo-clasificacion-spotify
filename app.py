@@ -248,7 +248,7 @@ elif pestaña == "Predicción de popularidad":
                 req = urllib.request.Request(URL, body, headers)
                 with urllib.request.urlopen(req) as response:
                     result = json.loads(response.read())
-                    st.write("Precio predicho:")
+                    st.write("Popularidad predicha:")
                     st.write(result)
             except urllib.error.HTTPError as error:
                     st.error(f"Error en la solicitud: {error.code}")
