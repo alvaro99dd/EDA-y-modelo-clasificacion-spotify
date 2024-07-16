@@ -323,12 +323,10 @@ elif pestaña == "Predicción de popularidad":
     # Spotify redirigirá a la URI con el parámetro `code` después de que el usuario autorice la aplicación
 
     # Obtener el token de acceso usando el código de autorización
-
     token_info = sp_oauth.get_cached_token()
 
     # Crear una instancia de Spotify usando el token de acceso
     sp = spotipy.Spotify(auth=token_info['access_token'])
-    
     
     genres = st.selectbox("Género", sp.recommendation_genre_seeds()["genres"])
     # sp.recommendations(min_danceability= danceability-0.05, max_danceability=danceability+0.05, target_danceability=danceability
