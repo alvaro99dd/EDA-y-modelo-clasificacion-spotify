@@ -291,9 +291,9 @@ elif pestaña == "Predicción de popularidad":
 
                 body = str.encode(json.dumps(data))
 
-                url = config['url']
+                url = config['spotify']['url']
                 # Replace this with the primary/secondary key, AMLToken, or Microsoft Entra ID token for the endpoint
-                api_key = config['api_key']
+                api_key = config['spotify']['api_key']
                 if not api_key:
                     raise Exception("A key should be provided to invoke the endpoint")
 
@@ -323,8 +323,8 @@ elif pestaña == "Predicción de popularidad":
                     print(error.info())
                     print(error.read().decode("utf8", 'ignore'))
     
-    sp_oauth = SpotifyOAuth(client_id = config['client_id'],
-                            client_secret = config['client_secret'],
+    sp_oauth = SpotifyOAuth(client_id = config['spotify']['client_id'],
+                            client_secret = config['spotify']['client_secret'],
                             redirect_uri="https://spotifyanalytics.streamlit.app/",
                             scope="user-library-read")
     

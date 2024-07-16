@@ -4,6 +4,7 @@ backgroundColor="#191414"
 secondaryBackgroundColor="#1DB954"
 textColor="#FFFFFF"
 font="sans serif"
+[spotify]
 client_id="9ae0fc81372340969a4009f8ab0380d2a"
 client_secret="7600be50bae14a028e20a02ae6d0ff28"
 api_key="hnMatWQ3K1NpdpDkEIXvR2C6Vj5xdEsQ"
