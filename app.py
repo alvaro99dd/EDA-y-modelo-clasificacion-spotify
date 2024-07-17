@@ -319,29 +319,100 @@ elif pestaña == "Predicción de popularidad":
 
     # Crear una instancia de Spotify usando el token de acceso
     sp = spotipy.Spotify(auth=token_info['access_token'])
-    
-    genres = st.selectbox("Género", sp.recommendation_genre_seeds()["genres"])
+    st.markdown("""
+    <style>
+    /* Cambiar el color de fondo de los tags */
+    .st-ck .st-bj {
+        background-color: #1DB954 !important; /* Verde */
+    }
+    /* Cambiar el color del texto de los tags */
+    .st-ck .st-bj {
+        color: white !important;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+    genres = st.multiselect("Género", sp.recommendation_genre_seeds()["genres"], max_selections=3)
     # sp.recommendations(min_danceability= danceability-0.05, max_danceability=danceability+0.05, target_danceability=danceability
     #                    , seed_genres=[genres], limit=5)["tracks"][0]["external_urls"]["spotify"]
+    parameters_list= ["danceability", "energy", "loudness", "speechiness", "acousticness", "instrumentalness", "valence", "tempo"]
+    parameters = st.sidebar.multiselect("Parámetros", parameters_list, max_selections=3)
+    if genres:
+        args_recomendaciones = {
+            "seed_genres": genres, 
+            "limit": 4
+        }
+        # results = sp.recommendations(min_danceability= danceability-0.05, max_danceability=danceability+0.05, target_danceability=danceability
+        #                             , min_energy=energy-0.05, max_energy=energy+0.05, target_energy=energy
+        #                             , seed_genres=genres, limit=4)
+        
+        
+        for parameter in parameters:
+            match parameter:
+                case "danceability":
+                    args_recomendaciones.update({
+                        "min_danceability": danceability-0.05, 
+                        "max_danceability": danceability+0.05, 
+                        "target_danceability": danceability
+                    })
+                case "energy":
+                    args_recomendaciones.update({
+                        "min_energy": energy-0.05, 
+                        "max_energy": energy+0.05, 
+                        "target_energy": energy
+                    })
+                case "loudness":
+                    args_recomendaciones.update({
+                        "min_loudness": loudness-5, 
+                        "max_loudness": loudness+5, 
+                        "target_loudness": loudness
+                    })
+                case "speechiness":
+                    args_recomendaciones.update({
+                        "min_speechiness": speechiness-0.05, 
+                        "max_speechiness": speechiness+0.05, 
+                        "target_speechiness": speechiness
+                    })
+                case "acousticness":
+                    args_recomendaciones.update({
+                        "min_acousticness": acousticness-0.05, 
+                        "max_acousticness": acousticness+0.05, 
+                        "target_acousticness": acousticness
+                    })
+                case "instrumentalness":
+                    args_recomendaciones.update({
+                        "min_instrumentalness": instrumentalness-0.05, 
+                        "max_instrumentalness": instrumentalness+0.05, 
+                        "target_instrumentalness": instrumentalness
+                    })
+                case "valence":
+                    args_recomendaciones.update({
+                        "min_valence": valence-0.05, 
+                        "max_valence": valence+0.05, 
+                        "target_valence": valence
+                    })
+                case "tempo":
+                    args_recomendaciones.update({
+                        "min_tempo": tempo-10, 
+                        "max_tempo": tempo+10, 
+                        "target_tempo": tempo
+                    })
+                
+        results = sp.recommendations(**args_recomendaciones)
 
-    results = sp.recommendations(min_danceability= danceability-0.05, max_danceability=danceability+0.05, target_danceability=danceability
-                                , min_energy=energy-0.05, max_energy=energy+0.05, target_energy=energy
-                                , seed_genres=[genres], limit=4)
+        cols = st.columns(4)
+        for i in range(len(results["tracks"])):
+            with cols[i]:
+                spotify_url = results["tracks"][i]["external_urls"]["spotify"]
+                if spotify_url:
+                    # Extract the Spotify track ID from the URL
+                    if 'track' in spotify_url:
+                        track_id = spotify_url.split('/')[-1].split('?')[0]
+                        embed_url = f"https://open.spotify.com/embed/track/{track_id}"
+                    else:
+                        embed_url = None
 
-    cols = st.columns(4)
-    for i in range(len(results["tracks"])):
-        with cols[i]:
-            spotify_url = results["tracks"][i]["external_urls"]["spotify"]
-            if spotify_url:
-                # Extract the Spotify track ID from the URL
-                if 'track' in spotify_url:
-                    track_id = spotify_url.split('/')[-1].split('?')[0]
-                    embed_url = f"https://open.spotify.com/embed/track/{track_id}"
-                else:
-                    embed_url = None
-
-                if embed_url:
-                    # Mostrar el reproductor de Spotify
-                    st.components.v1.iframe(embed_url, width=300, height=380)
-                else:
-                    st.write("La URL proporcionada no es válida. Asegúrate de que sea una URL de pista o lista de reproducción de Spotify.")
+                    if embed_url:
+                        # Mostrar el reproductor de Spotify
+                        st.components.v1.iframe(embed_url, width=300, height=380)
+                    else:
+                        st.write("La URL proporcionada no es válida. Asegúrate de que sea una URL de pista o lista de reproducción de Spotify.")
