@@ -292,18 +292,13 @@ elif pestaña == "Predicción de popularidad":
     st.write("""
     <style>
     /* Cambiar el color de fondo de los tags */
-    .st-ce.st-f2.st-cg.st-ch.st-ci.st-cj.st-bj.st-cd.st-bk.st-aj.st-ak.st-al.st-am.st-f3.st-f4.st-f5.st-f6.st-bf.st-bg.st-bi.st-bh.st-d4.st-f7.st-f8.st-f9.st-d6.st-fa.st-fb.st-bv.st-fc.st-fd.st-fe.st-dh.st-ff.st-bw.st-fg {
-        background-color: #1DB954 !important; /* Nuevo color de fondo */
+    .st-ck .st-bj {
+        background-color: #1DB954 !important; /* Verde */
     }
 
-    /* Cambiar el color del texto dentro de los tags */
-    .st-ce.st-f2.st-cg.st-ch.st-ci.st-cj.st-bj.st-cd.st-bk.st-aj.st-ak.st-al.st-am.st-f3.st-f4.st-f5.st-f6.st-bf.st-bg.st-bi.st-bh.st-d4.st-f7.st-f8.st-f9.st-d6.st-fa.st-fb.st-bv.st-fc.st-fd.st-fe.st-dh.st-ff.st-bw.st-fg .st-d5.st-e1.st-e0.st-fh.st-fi.st-cf {
-        color: white !important; /* Nuevo color de texto */
-    }
-
-    /* Cambiar el color y el estilo del ícono de cierre (X) en los tags */
-    .st-ce.st-f2.st-cg.st-ch.st-ci.st-cj.st-bj.st-cd.st-bk.st-aj.st-ak.st-al.st-am.st-f3.st-f4.st-f5.st-f6.st-bf.st-bg.st-bi.st-bh.st-d4.st-f7.st-f8.st-f9.st-d6.st-fa.st-fb.st-bv.st-fc.st-fd.st-fe.st-dh.st-ff.st-bw.st-fg .st-bj.st-cw.st-cv.st-b3.st-az.st-fj.st-bw.st-fk.st-fl.st-c1.st-bc svg {
-        fill: white !important; /* Cambiar el color del ícono de cierre */
+    /* Cambiar el color del texto de los tags */
+    .st-ck .st-bj {
+        color: white !important;
     }
     </style>
     """, unsafe_allow_html=True)
