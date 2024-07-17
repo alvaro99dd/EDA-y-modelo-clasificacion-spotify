@@ -6,8 +6,7 @@ import os
 import ssl
 import json
 import spotipy
-import time
-from spotipy.oauth2 import SpotifyOAuth
+from spotipy.oauth2 import SpotifyClientCredentials
 import toml
 import streamlit.components.v1 as components
 
@@ -20,96 +19,6 @@ def cargar_datos():
     return df
 
 config = toml.load(".streamlit/config.toml")
-
-def get_token(oauth, code):
-
-    token = oauth.get_access_token(code, as_dict=False, check_cache=False)
-    # remove cached token saved in directory
-    os.remove(".cache")
-    
-    # return the token
-    return token
-
-def sign_in(token):
-    sp = spotipy.Spotify(auth=token)
-    return sp
-
-def app_get_token():
-    try:
-        token = get_token(st.session_state["oauth"], st.session_state["code"])
-    except Exception as e:
-        st.error("An error occurred during token retrieval!")
-        st.write("The error is as follows:")
-        st.write(e)
-    else:
-        st.session_state["cached_token"] = token
-
-def app_sign_in():
-    try:
-        sp = sign_in(st.session_state["cached_token"])
-    except Exception as e:
-        st.error("An error occurred during sign-in!")
-        st.write("The error is as follows:")
-        st.write(e)
-    else:
-        st.session_state["signed_in"] = True
-        app_welcome()
-        st.success("Sign in success!")
-    return sp
-
-def app_welcome():
-    # import secrets from streamlit deployment
-    cid = config['spotify']['client_id']
-    csecret = config['spotify']['client_secret']
-    uri = config['spotify']['redirect_uri']
-
-    # set scope and establish connection
-    scopes = config['spotify']['scope']
-    
-    oauth = SpotifyOAuth(scope=scopes,
-                         redirect_uri=uri,
-                         client_id=cid,
-                         client_secret=csecret)
-    # store oauth in session
-    st.session_state["oauth"] = oauth
-
-    # retrieve auth url
-    auth_url = oauth.get_authorize_url()
-    
-    # this SHOULD open the link in the same tab when Streamlit Cloud is updated
-    # via the "_self" target
-    link_html = " <a target=\"_self\" href=\"{url}\" >{msg}</a> ".format(
-        url=auth_url,
-        msg="Click me to authenticate!"
-    )
-    if not st.session_state["signed_in"]:
-        st.write(" ".join(["No tokens found for this session. Please log in by",
-                          "clicking the link below."]))
-        st.markdown(link_html, unsafe_allow_html=True)
-
-if "signed_in" not in st.session_state:
-    st.session_state["signed_in"] = False
-if "cached_token" not in st.session_state:
-    st.session_state["cached_token"] = ""
-if "code" not in st.session_state:
-    st.session_state["code"] = ""
-if "oauth" not in st.session_state:
-    st.session_state["oauth"] = None
-
-# get current url (stored as dict)
-url_params = st.query_params
-# attempt sign in with cached token
-if st.session_state["cached_token"] != "":
-    sp = app_sign_in()
-# if no token, but code in url, get code, parse token, and sign in
-elif "code" in url_params:
-    # all params stored as lists, see doc for explanation
-    st.session_state["code"] = url_params["code"][0]
-    app_get_token()
-    sp = app_sign_in()
-else:
-    sp = app_sign_in()
-    app_get_token()
 
 def clean_outliers(df_aux, columns: list)->pd.DataFrame:
     for column in columns:
@@ -132,7 +41,6 @@ st.markdown(
     """,
     unsafe_allow_html=True
 )
-
 
 st.markdown("<h1 class='title'>Análisis de canciones en Spotify</h1>", unsafe_allow_html=True)
 st.divider()
@@ -178,7 +86,7 @@ elif pestaña == "Distribución variables":
         st.image('imagenes/spearman.png')
 
 elif pestaña == "Popularidad":
-    st.sidebar.markdown("---")
+    st.sidebar.divider()
     st.sidebar.markdown("### Configuración")
     numero_artistas = st.sidebar.slider("Número de artistas", 1, 50, 10, key="artistas")
     numero_canciones = st.sidebar.slider("Número de canciones", 1, 50, 10, key="canciones")
@@ -284,6 +192,7 @@ elif pestaña == "Informe":
     frameborder="0" allowFullScreen="true"></iframe>'''
     components.html(codigo_iframe, width=1320, height=1250)
 elif pestaña == "Predicción de popularidad":
+    st.sidebar.divider()
     st.markdown("### Predicción de la popularidad")
     with st.form(key="form"):
         cols = st.columns(3)
@@ -330,12 +239,11 @@ elif pestaña == "Predicción de popularidad":
                 }
                 }
 
-
                 body = str.encode(json.dumps(data))
 
-                url = config['azure']['url']
+                url = st.secrets['azure']['url']
                 # Replace this with the primary/secondary key, AMLToken, or Microsoft Entra ID token for the endpoint
-                api_key = config['azure']['api_key']
+                api_key = st.secrets['azure']['api_key']
                 if not api_key:
                     raise Exception("A key should be provided to invoke the endpoint")
 
@@ -360,56 +268,33 @@ elif pestaña == "Predicción de popularidad":
                     """, unsafe_allow_html=True)
                 except urllib.error.HTTPError as error:
                     print("The request failed with status code: " + str(error.code))
-
-                    # Print the headers - they include the requert ID and the timestamp, which are useful for debugging the failure
                     print(error.info())
                     print(error.read().decode("utf8", 'ignore'))
 
+    auth_manager=SpotifyClientCredentials(client_id=st.secrets["spotify"]["client_id"], client_secret=st.secrets["spotify"]["client_secret"], requests_session=True)
+    sp = spotipy.Spotify(auth_manager=auth_manager)
 
-
-    # sp_oauth = SpotifyOAuth(
-    #     client_id=config['spotify']['client_id'],
-    #     client_secret=config['spotify']['client_secret'],
-    #     redirect_uri=config['spotify']['redirect_uri'],
-    #     scope=config['spotify']['scope']
-    # )
-
-    # Obtener el URL de autorización
-    # auth_url = sp_oauth.get_authorize_url()
-
-
-
-    # Obtener el token de acceso usando el código de autorización
-    # token_info = sp_oauth.get_cached_token()
-
-    # Crear una instancia de Spotify usando el token de acceso
-    # sp = spotipy.Spotify(auth=token_info['access_token'])
     st.markdown("""
-    <style>
-    /* Cambiar el color de fondo de los tags */
-    .st-ck .st-bj {
-        background-color: #1DB954 !important; /* Verde */
-    }
-    /* Cambiar el color del texto de los tags */
-    .st-ck .st-bj {
-        color: white !important;
-    }
-    </style>
-    """, unsafe_allow_html=True)
-    genres = st.multiselect("Género", sp.recommendation_genre_seeds()["genres"], max_selections=3)
-    # sp.recommendations(min_danceability= danceability-0.05, max_danceability=danceability+0.05, target_danceability=danceability
-    #                    , seed_genres=[genres], limit=5)["tracks"][0]["external_urls"]["spotify"]
+        <style>
+        /* Cambiar el color de fondo de los tags */
+        .st-ck .st-bj {
+            background-color: #1DB954 !important; /* Verde */
+        }
+        /* Cambiar el color del texto de los tags */
+        .st-ck .st-bj {
+            color: white !important;
+        }
+        </style>
+        """, unsafe_allow_html=True)
+    genres = st.multiselect("Selecciona de uno a tres géneros para obtener canciones similares ", sp.recommendation_genre_seeds()["genres"], max_selections=3)
     parameters_list= ["danceability", "energy", "loudness", "speechiness", "acousticness", "instrumentalness", "valence", "tempo"]
-    parameters = st.sidebar.multiselect("Parámetros", parameters_list, max_selections=3)
+    st.sidebar.markdown("### Parámetros")
+    parameters = st.sidebar.multiselect("Seleccione de uno a tres parámetros", parameters_list, max_selections=3)
     if genres:
         args_recomendaciones = {
             "seed_genres": genres, 
             "limit": 4
         }
-        # results = sp.recommendations(min_danceability= danceability-0.05, max_danceability=danceability+0.05, target_danceability=danceability
-        #                             , min_energy=energy-0.05, max_energy=energy+0.05, target_energy=energy
-        #                             , seed_genres=genres, limit=4)
-        
         
         for parameter in parameters:
             match parameter:
@@ -469,7 +354,6 @@ elif pestaña == "Predicción de popularidad":
             with cols[i]:
                 spotify_url = results["tracks"][i]["external_urls"]["spotify"]
                 if spotify_url:
-                    # Extract the Spotify track ID from the URL
                     if 'track' in spotify_url:
                         track_id = spotify_url.split('/')[-1].split('?')[0]
                         embed_url = f"https://open.spotify.com/embed/track/{track_id}"
@@ -477,7 +361,6 @@ elif pestaña == "Predicción de popularidad":
                         embed_url = None
 
                     if embed_url:
-                        # Mostrar el reproductor de Spotify
                         st.components.v1.iframe(embed_url, width=300, height=380)
                     else:
                         st.write("La URL proporcionada no es válida. Asegúrate de que sea una URL de pista o lista de reproducción de Spotify.")
