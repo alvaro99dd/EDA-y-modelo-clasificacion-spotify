@@ -121,8 +121,8 @@ elif pestaña == "Popularidad":
     numero_artistas = st.sidebar.slider("Número de artistas", 1, 50, 10, key="artistas")
     numero_canciones = st.sidebar.slider("Número de canciones", 1, 50, 10, key="canciones")
 
-    tabsPrecio = st.tabs([f"Top Artistas y Canciones", "Bailable", "Género", "Energía", "Positividad"])
-    with tabsPrecio[0]:
+    tabsPopularidad = st.tabs([f"Top Artistas y Canciones", "Bailable", "Género", "Energía", "Positividad"])
+    with tabsPopularidad[0]:
         top_n_artists = calcular_top_artistas(df, numero_artistas)
         fig = px.treemap(top_n_artists,  
                         path=['artist_name'], 
@@ -153,21 +153,21 @@ elif pestaña == "Popularidad":
                                     ,labels={"genre": "Género", "key": "Key", "mode": "Modo", "popularity": "Popularidad"})
         st.plotly_chart(fig)
 
-    with tabsPrecio[1]:
+    with tabsPopularidad[1]:
         # Grafica canciones más populares y su bailabilidad
         df_aux = ordenar_por_popularidad(df, numero_canciones)
         fig = px.area(df_aux, x='track_name', y='danceability', title=f'Top {numero_canciones} canciones con mayor popularidad y su bailabilidad'
                 , hover_data=["artist_name", "popularity"], labels={"danceability": "Bailabilidad", "track_name": "Canción", "artist_name": "Artista", "popularity": "Popularidad"}
                 , markers=True)
         st.plotly_chart(fig)
-    with tabsPrecio[2]:
+    with tabsPopularidad[2]:
         # Histograma de popularidad media por género y año
         html_content = cargar_html("html/popularidadgeneros.html")
         st.components.v1.html(html_content, height=700)
-    with tabsPrecio[3]:
+    with tabsPopularidad[3]:
         html_content = cargar_html("html/energiapopularidad.html")
         st.components.v1.html(html_content, height=700)
-    with tabsPrecio[4]:
+    with tabsPopularidad[4]:
         # Histograma de media de la positividad en base a la popularidad segun el año
         html_content = cargar_html("html/positividadpopularidad.html")
         st.components.v1.html(html_content, height=700)
@@ -175,8 +175,8 @@ elif pestaña == "Características de la canción":
     st.sidebar.markdown("---")
     st.sidebar.markdown("### Configuración")
     numero_artistas = st.sidebar.slider("Número de artistas", 1, 50, 10, key="artistas")
-    tabsVecindario = st.tabs(["Artistas", "Volumen", "Tempo"])
-    with tabsVecindario[0]:
+    tabsCaracteristicas = st.tabs(["Artistas", "Volumen", "Tempo"])
+    with tabsCaracteristicas[0]:
         # Grafico artistas con mas canciones
         
         top_50_artists = artistas_con_mas_canciones(df, numero_artistas)
@@ -190,13 +190,13 @@ elif pestaña == "Características de la canción":
                         labels={'song_count': 'Total Canciones'})
         fig.update_traces(hovertemplate='Artista: %{label}<br>Número de Canciones: %{value}')
         st.plotly_chart(fig)
-    with tabsVecindario[1]:
+    with tabsCaracteristicas[1]:
         # Histograma de volumen con la energía promedio
         with open("html/volumenenergia.html", "r", encoding="utf-8") as f:
             html_content = f.read()
         st.components.v1.html(html_content, height=700)
 
-    with tabsVecindario[2]:
+    with tabsCaracteristicas[2]:
         # Histograma bailabilidad en base al tempo de las canciones
         html_content = cargar_html("html/tempobailable.html")
         st.components.v1.html(html_content, height=500)
