@@ -289,7 +289,7 @@ elif pestaña == "Predicción de popularidad":
     auth_manager=SpotifyClientCredentials(client_id=st.secrets["spotify"]["client_id"], client_secret=st.secrets["spotify"]["client_secret"], requests_session=True)
     sp = spotipy.Spotify(auth_manager=auth_manager)
 
-    st.markdown("""
+    st.write("""
     <style>
     /* Cambiar el color de fondo de los tags */
     .st-ce.st-f2.st-cg.st-ch.st-ci.st-cj.st-bj.st-cd.st-bk.st-aj.st-ak.st-al.st-am.st-f3.st-f4.st-f5.st-f6.st-bf.st-bg.st-bi.st-bh.st-d4.st-f7.st-f8.st-f9.st-d6.st-fa.st-fb.st-bv.st-fc.st-fd.st-fe.st-dh.st-ff.st-bw.st-fg {
