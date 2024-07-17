@@ -301,6 +301,25 @@ elif pestaña == "Predicción de popularidad":
         }
         </style>
         """, unsafe_allow_html=True)
+    
+
+    custom_css = """
+    <style>
+    /* Cambiar el color de fondo de los tags */
+    .st-ck .st-bj {
+        background-color: #1DB954 !important; /* Verde */
+    }
+
+    /* Cambiar el color del texto de los tags */
+    .st-ck .st-bj {
+        color: white !important;
+    }
+    </style>
+    """
+
+    # Apply custom CSS
+    st.markdown(custom_css, unsafe_allow_html=True)
+
     genres = st.multiselect("Selecciona de uno a tres géneros para obtener canciones similares ", sp.recommendation_genre_seeds()["genres"], max_selections=3)
     parameters_list= ["danceability", "energy", "loudness", "speechiness", "acousticness", "instrumentalness", "valence", "tempo"]
     st.sidebar.markdown("### Parámetros")
