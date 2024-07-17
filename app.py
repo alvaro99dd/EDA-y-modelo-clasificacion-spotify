@@ -18,6 +18,36 @@ def cargar_datos():
     df = pd.read_csv("spotify_data_cleaned.zip", low_memory=False)
     return df
 
+@st.cache_data(ttl=3600)
+def calcular_top_artistas(df, numero_artistas):
+    artist_info = df.groupby('artist_name').agg({
+        'popularity': 'mean',
+        'genre': 'first'  # Tomar el primer género encontrado para cada artista
+    }).reset_index()
+    artist_info.rename(columns={'popularity': 'average_popularity'}, inplace=True)
+    top_n_artists = artist_info.sort_values(by='average_popularity', ascending=False).head(numero_artistas)
+    top_n_artists['genre'] = top_n_artists['genre'].apply(lambda x: x.capitalize())
+    return top_n_artists
+
+@st.cache_data(ttl=3600)
+def ordenar_por_popularidad(df, top):
+    df = df.sort_values(by='popularity', ascending=False).head(top)
+    return df
+
+@st.cache_data(ttl=3600)
+def artistas_con_mas_canciones(df, numero_artistas):
+    df_aux = df
+    songs_per_artist = df_aux.groupby('artist_name', as_index=False)['track_name'].count()
+    songs_per_artist.rename(columns={'track_name': 'song_count'}, inplace=True)
+    top_50_artists = songs_per_artist.sort_values(by='song_count', ascending=False).head(numero_artistas)
+    return top_50_artists
+
+@st.cache_data(ttl=3600)
+def cargar_html(ruta_archivo):
+    with open(ruta_archivo, "r", encoding="utf-8") as f:
+        html_content = f.read()
+    return html_content
+
 config = toml.load(".streamlit/config.toml")
 
 def clean_outliers(df_aux, columns: list)->pd.DataFrame:
@@ -93,15 +123,7 @@ elif pestaña == "Popularidad":
 
     tabsPrecio = st.tabs([f"Top Artistas y Canciones", "Bailable", "Género", "Energía", "Positividad"])
     with tabsPrecio[0]:
-        # Grafica de los artistas más populares y su género
-        artist_info = df.groupby('artist_name').agg({
-            'popularity': 'mean',
-            'genre': 'first'  # Concatena géneros únicos
-        }).reset_index()
-        artist_info.rename(columns={'popularity': 'average_popularity'}, inplace=True)
-        top_n_artists = artist_info.sort_values(by='average_popularity', ascending=False).head(numero_artistas)
-        top_n_artists['genre'] = top_n_artists['genre'].apply(lambda x: x.capitalize())
-
+        top_n_artists = calcular_top_artistas(df, numero_artistas)
         fig = px.treemap(top_n_artists,  
                         path=['artist_name'], 
                         values='average_popularity',
@@ -122,7 +144,7 @@ elif pestaña == "Popularidad":
             st.image('imagenes/escalapopularidad.png')
 
         # Grafica top canciones más populares y su camino hacia la popularidad
-        df_aux = df.sort_values(by='popularity', ascending=False).head(numero_canciones)
+        df_aux = ordenar_por_popularidad(df, numero_canciones)
         fig = px.parallel_categories(df_aux
                                     ,dimensions=['genre', 'key', 'mode', 'popularity']
                                     ,color="popularity"
@@ -133,25 +155,21 @@ elif pestaña == "Popularidad":
 
     with tabsPrecio[1]:
         # Grafica canciones más populares y su bailabilidad
-        df_aux = df.sort_values(by='popularity', ascending=False).head(numero_canciones)
+        df_aux = ordenar_por_popularidad(df, numero_canciones)
         fig = px.area(df_aux, x='track_name', y='danceability', title=f'Top {numero_canciones} canciones con mayor popularidad y su bailabilidad'
                 , hover_data=["artist_name", "popularity"], labels={"danceability": "Bailabilidad", "track_name": "Canción", "artist_name": "Artista", "popularity": "Popularidad"}
                 , markers=True)
         st.plotly_chart(fig)
     with tabsPrecio[2]:
         # Histograma de popularidad media por género y año
-        with open("html/popularidadgeneros.html", "r", encoding="utf-8") as f:
-            html_content = f.read()
+        html_content = cargar_html("html/popularidadgeneros.html")
         st.components.v1.html(html_content, height=700)
     with tabsPrecio[3]:
-        # Histograma de media de la energía en base a la popularidad segun el año
-        with open("html/energiapopularidad.html", "r", encoding="utf-8") as f:
-            html_content = f.read()
+        html_content = cargar_html("html/energiapopularidad.html")
         st.components.v1.html(html_content, height=700)
     with tabsPrecio[4]:
         # Histograma de media de la positividad en base a la popularidad segun el año
-        with open("html/positividadpopularidad.html", "r", encoding="utf-8") as f:
-            html_content = f.read()
+        html_content = cargar_html("html/positividadpopularidad.html")
         st.components.v1.html(html_content, height=700)
 elif pestaña == "Características de la canción":
     st.sidebar.markdown("---")
@@ -160,10 +178,9 @@ elif pestaña == "Características de la canción":
     tabsVecindario = st.tabs(["Artistas", "Volumen", "Tempo"])
     with tabsVecindario[0]:
         # Grafico artistas con mas canciones
-        df_aux = df
-        songs_per_artist = df_aux.groupby('artist_name', as_index=False)['track_name'].count()
-        songs_per_artist.rename(columns={'track_name': 'song_count'}, inplace=True)
-        top_50_artists = songs_per_artist.sort_values(by='song_count', ascending=False).head(numero_artistas)
+        
+        top_50_artists = artistas_con_mas_canciones(df, numero_artistas)
+
         fig = px.treemap(top_50_artists, 
                         path=['artist_name'], 
                         values='song_count',
@@ -181,8 +198,7 @@ elif pestaña == "Características de la canción":
 
     with tabsVecindario[2]:
         # Histograma bailabilidad en base al tempo de las canciones
-        with open("html/tempobailable.html", "r", encoding="utf-8") as f:
-            html_content = f.read()
+        html_content = cargar_html("html/tempobailable.html")
         st.components.v1.html(html_content, height=500)
         st.image('imagenes/tempobailable.png')  
 elif pestaña == "Informe":
