@@ -6,6 +6,7 @@ import os
 import ssl
 import json
 import spotipy
+import time
 from spotipy.oauth2 import SpotifyOAuth
 import toml
 import streamlit.components.v1 as components
@@ -306,19 +307,66 @@ elif pestaña == "Predicción de popularidad":
     )
 
     # Obtener el URL de autorización
-    auth_url = sp_oauth.get_authorize_url()
+    # auth_url = sp_oauth.get_authorize_url()
 
-    # En tu aplicación, redirige al usuario a `auth_url` para que autorice la aplicación
+    # # En tu aplicación, redirige al usuario a `auth_url` para que autorice la aplicación
 
-    # Capturar el código de autorización devuelto por Spotify
-    # Este paso suele ser gestionado por una redirección a la URI especificada
-    # Spotify redirigirá a la URI con el parámetro `code` después de que el usuario autorice la aplicación
+    # # Capturar el código de autorización devuelto por Spotify
+    # # Este paso suele ser gestionado por una redirección a la URI especificada
+    # # Spotify redirigirá a la URI con el parámetro `code` después de que el usuario autorice la aplicación
 
-    # Obtener el token de acceso usando el código de autorización
-    token_info = sp_oauth.get_cached_token()
+    # # Obtener el token de acceso usando el código de autorización
+    # token_info = sp_oauth.get_cached_token()
 
-    # Crear una instancia de Spotify usando el token de acceso
-    sp = spotipy.Spotify(auth=token_info['access_token'])
+    # # Crear una instancia de Spotify usando el token de acceso
+    # sp = spotipy.Spotify(auth=token_info['access_token'])
+
+
+
+    # Función para gestionar la renovación del token
+    class SpotifyClient:
+        def __init__(self, sp_oauth):
+            self.sp_oauth = sp_oauth
+            self.token_info = self.sp_oauth.get_cached_token()
+            if not self.token_info or self.sp_oauth.is_token_expired(self.token_info):
+                self.token_info = self.sp_oauth.refresh_access_token(self.token_info['refresh_token'])
+            self.sp = spotipy.Spotify(auth=self.token_info['access_token'])
+            self.expiration = self.token_info['expires_at']
+        
+        def get_spotify(self):
+            if time.time() > self.expiration:
+                self.token_info = self.sp_oauth.refresh_access_token(self.token_info['refresh_token'])
+                self.sp = spotipy.Spotify(auth=self.token_info['access_token'])
+                self.expiration = self.token_info['expires_at']
+            return self.sp
+
+    # Streamlit app
+    st.title('Spotify Authentication')
+
+
+    if "code" in st.query_params and st.query_params["code"]:
+        # Since query_params returns a list of values for each key, access the first item
+        code = st.query_params["code"][0]
+        st.session_state.token_info = sp_oauth.get_access_token(code)
+        st.success('Authorization successful!')
+    else:
+        # Si no hay código, mostrar el enlace de autorización
+        auth_url = sp_oauth.get_authorize_url()
+        st.write(f"Please navigate [here]({auth_url}) to authorize the application.")
+
+
+    if 'token_info' in st.session_state:
+        spotify_client = SpotifyClient(sp_oauth)
+        sp = spotify_client.get_spotify()
+        
+        # Ejemplo de uso: obtener información del usuario actual
+        current_user = sp.current_user()
+        st.write('Current user profile:', current_user)
+
+
+
+
+
     st.markdown("""
     <style>
     /* Cambiar el color de fondo de los tags */
