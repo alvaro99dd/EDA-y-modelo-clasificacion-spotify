@@ -6,6 +6,7 @@ import os
 import ssl
 import json
 import spotipy
+import time
 from spotipy.oauth2 import SpotifyOAuth
 import toml
 import streamlit.components.v1 as components
@@ -376,11 +377,7 @@ elif pestaña == "Predicción de popularidad":
     # Obtener el URL de autorización
     # auth_url = sp_oauth.get_authorize_url()
 
-    # En tu aplicación, redirige al usuario a `auth_url` para que autorice la aplicación
 
-    # Capturar el código de autorización devuelto por Spotify
-    # Este paso suele ser gestionado por una redirección a la URI especificada
-    # Spotify redirigirá a la URI con el parámetro `code` después de que el usuario autorice la aplicación
 
     # Obtener el token de acceso usando el código de autorización
     # token_info = sp_oauth.get_cached_token()
