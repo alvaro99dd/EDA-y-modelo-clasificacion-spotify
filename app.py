@@ -289,18 +289,20 @@ elif pestaña == "Predicción de popularidad":
     auth_manager=SpotifyClientCredentials(client_id=st.secrets["spotify"]["client_id"], client_secret=st.secrets["spotify"]["client_secret"], requests_session=True)
     sp = spotipy.Spotify(auth_manager=auth_manager)
 
-    st.markdown("""
-        <style>
-        /* Cambiar el color de fondo de los tags */
-        .st-ck .st-bj {
-            background-color: #1DB954 !important; /* Verde */
-        }
-        /* Cambiar el color del texto de los tags */
-        .st-ck .st-bj {
-            color: white !important;
-        }
-        </style>
-        """, unsafe_allow_html=True)
+    st.write("""
+    <style>
+    /* Cambiar el color de fondo de los tags */
+    .st-ck .st-bj {
+        background-color: #1DB954 !important; /* Verde */
+    }
+
+    /* Cambiar el color del texto de los tags */
+    .st-ck .st-bj {
+        color: white !important;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+
     genres = st.multiselect("Selecciona de uno a tres géneros para obtener canciones similares ", sp.recommendation_genre_seeds()["genres"], max_selections=3)
     parameters_list= ["danceability", "energy", "loudness", "speechiness", "acousticness", "instrumentalness", "valence", "tempo"]
     st.sidebar.markdown("### Parámetros")
