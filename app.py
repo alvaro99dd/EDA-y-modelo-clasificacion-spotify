@@ -152,7 +152,6 @@ elif pestaña == "Popularidad":
                                     ,title=f'Top {numero_canciones} canciones y su camino hacia la popularidad'
                                     ,labels={"genre": "Género", "key": "Key", "mode": "Modo", "popularity": "Popularidad"})
         st.plotly_chart(fig)
-
     with tabsPopularidad[1]:
         # Grafica canciones más populares y su bailabilidad
         df_aux = ordenar_por_popularidad(df, numero_canciones)
