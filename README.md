@@ -28,5 +28,5 @@ A continuación os mostramos una lista con las métricas analizadas y una breve 
 Tras realizar un buen prepocesamiento de cara al machine learning y hacer algunas pruebas en local, decidimos usar [Azure](https://portal.azure.com/#home) para encontrar el modelo más óptimo y con mejor precisión. Finalmente, el modelo utilizado ha sido VotingEnsemble
 
 ### Resultados
-Hemos conseguido una precisión de más de un 70% usando tan sólo los parámetros de Spotify, el modelo predice con bastante lógica si según estos modelos será popular o no una canción. Hay que tener en cuenta que estas predicciones no tienen una causalidad directa, ya que no se tienen en cuenta cosas como la popularidad base del artista, sucesos sociales, viralidad, etc.
+Hemos conseguido una precisión de más de un 70% usando tan sólo los parámetros de Spotify, el modelo predice con bastante lógica si según estas características una canción será popular o no. Hay que tener en cuenta que estas predicciones no tienen una causalidad directa, ya que no se tienen en cuenta cosas como la popularidad base del artista, sucesos sociales, viralidad, etc.
 Ha sido un proyecto muy interesentante en el que hemos aprendido muchísimo sobre el manejo de APIs y ML.

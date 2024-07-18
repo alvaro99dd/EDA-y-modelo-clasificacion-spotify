@@ -100,10 +100,11 @@ if pestaña == "Inicio":
         
         
         ### Secciones
-        - **Distribución de Variables:** Visualiza la distribución de las características principales de las canciones.
-        - **Popularidad:** Explora qué artistas y canciones son los más populares, junto con diversas métricas de popularidad.
-        - **Características de la Canción:** Analiza las características específicas de las canciones, como volumen, tempo, y más.
-        - **Informe:** Accede a un informe interactivo detallado generado con Power BI.
+        - **Distribución de Variables:** Visualizar la distribución de las características principales de las canciones.
+        - **Popularidad:** Explorar qué artistas y canciones son los más populares, junto con diversas métricas de popularidad.
+        - **Características de la Canción:** Analizar las características específicas de las canciones, como volumen, tempo, y más.
+        - **Informe:** Acceder a un informe interactivo detallado generado con Power BI.
+        - **Predicción de Popularidad:** Predecir la popularidad de una canción en base a sus características.
     """)
     with cols[1]:
         st.image('imagenes/inicio.png', caption="eyeofthehurricane.news",)
