@@ -1,2 +1,4 @@
 .env
 .streamlit/secrets.toml
+EDA_Alvaro.ipynb
+Graficas_Borja.ipynb
