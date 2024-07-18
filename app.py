@@ -336,11 +336,10 @@ elif pestaña == "Predicción de popularidad":
     # Cambiamos el color de los multiselect
     st.markdown("""
     <style>        
-    
-    [data-baseweb="tag"] {
-    background-color: #1DB954;
-    color: white;
-    }            
+        [data-baseweb="tag"] {
+        background-color: #1DB954;
+        color: white;
+        }            
     </style>
     """, unsafe_allow_html=True)
 
