@@ -187,7 +187,7 @@ elif pestaña == "Popularidad":
                                     ,dimensions=['genre', 'key', 'mode', 'popularity']
                                     ,color="popularity"
                                     ,color_continuous_scale=px.colors.sequential.Agsunset
-                                    ,title=f'Top {numero_canciones} canciones y su camino hacia la popularidad'
+                                    ,title=f'Top {numero_canciones} canciones mas populares y su camino hacia la popularidad'
                                     ,labels={"genre": "Género", "key": "Key", "mode": "Modo", "popularity": "Popularidad"})
         st.plotly_chart(fig)
     with tabsPopularidad[1]:
