@@ -71,6 +71,9 @@ def cargar_html(ruta_archivo):
         html_content = f.read()
     return html_content
 
+def recommendations(_sp:spotipy.Spotify)->list:
+    return sp.recommendation_genre_seeds()["genres"]
+
 def clean_outliers(df_aux, columns: list)->pd.DataFrame:
     """
     Función para eliminar los outliers de un dataframe usando el rango intercuartílico.
@@ -344,7 +347,7 @@ elif pestaña == "Predicción de popularidad":
     """, unsafe_allow_html=True)
 
     # Multiselect para seleccionar los géneros y hacemos una petición a la API de Spotify para obtener los géneros disponibles
-    genres = st.multiselect("Selecciona de uno a tres géneros para obtener canciones similares ", sp.recommendation_genre_seeds()["genres"], max_selections=3)
+    genres = st.multiselect("Selecciona de uno a tres géneros para obtener canciones similares ", recommendations(sp), max_selections=3)
     parameters_list= ["danceability", "energy", "loudness", "speechiness", "acousticness", "instrumentalness", "valence", "tempo"]
     st.sidebar.markdown("### Parámetros")
     # Multiselect para seleccionar los parámetros de la canción
