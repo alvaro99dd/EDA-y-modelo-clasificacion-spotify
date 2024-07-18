@@ -289,16 +289,11 @@ elif pestaña == "Predicción de popularidad":
     auth_manager=SpotifyClientCredentials(client_id=st.secrets["spotify"]["client_id"], client_secret=st.secrets["spotify"]["client_secret"], requests_session=True)
     sp = spotipy.Spotify(auth_manager=auth_manager)
 
-    st.write("""
-    <style>
-    /* Cambiar el color de fondo de los tags */
-    .st-ck .st-bj {
-        background-color: #1DB954 !important; /* Verde */
-    }
-
-    /* Cambiar el color del texto de los tags */
-    .st-ck .st-bj {
-        color: white !important;
+    st.markdown("""
+    <style>        
+    .st-bt.st-ep.st-bv.st-bw.st-bx.st-by.st-ay.st-bs.st-az.st-cr.st-cs.st-ct.st-cu.st-eq.st-er.st-es.st-et.st-au.st-av.st-ax.st-aw.st-cj.st-eu.st-ev.st-ew.st-cl.st-ex.st-ey.st-ba.st-ez.st-f0.st-f1.st-d3.st-f2.st-bb.st-f3 {
+        background-color: #1DB954; /* Cambia este valor al color que desees */
+        color: white; /* Color del texto dentro del tag */
     }
     </style>
     """, unsafe_allow_html=True)
