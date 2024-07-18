@@ -336,10 +336,11 @@ elif pestaña == "Predicción de popularidad":
     # Cambiamos el color de los multiselect
     st.markdown("""
     <style>        
-    .st-bt.st-ep.st-bv.st-bw.st-bx.st-by.st-ay.st-bs.st-az.st-cr.st-cs.st-ct.st-cu.st-eq.st-er.st-es.st-et.st-au.st-av.st-ax.st-aw.st-cj.st-eu.st-ev.st-ew.st-cl.st-ex.st-ey.st-ba.st-ez.st-f0.st-f1.st-d3.st-f2.st-bb.st-f3 {
-        background-color: #1DB954;
-        color: white;
-    }
+    
+    [data-baseweb="tag"] {
+    background-color: #1DB954;
+    color: white;
+    }            
     </style>
     """, unsafe_allow_html=True)
 
