@@ -128,7 +128,7 @@ if pestaña == "Inicio":
         st.markdown("""
         En este estudio descubriremos cómo crear un nuevo hit ayudándonos de los parámetros que utiliza spotify para clasificar sus canciones.
 
-        ### Objetivo
+        ### Objetivos
         - Analizar las características de las canciones en Spotify.
         - Identificar las características que hacen que una canción sea popular.
         - Poder crear un hit utilizando las características analizadas.
