@@ -129,8 +129,6 @@ if pestaña == "Inicio":
         - Analizar las características de las canciones en Spotify.
         - Identificar las características que hacen que una canción sea popular.
         - Poder crear un hit utilizando las características analizadas.
-        - **Fuente de datos:** [Kaggle](https://www.kaggle.com/ziriantahirli/million-song-data-analysis-2)
-        
         
         ### Secciones
         - **Distribución de Variables:** Visualizar la distribución de las características principales de las canciones.
