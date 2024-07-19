@@ -71,6 +71,7 @@ def cargar_html(ruta_archivo):
         html_content = f.read()
     return html_content
 
+@st.cache_data(ttl=3600)
 def recommendations(_sp:spotipy.Spotify)->list:
     return sp.recommendation_genre_seeds()["genres"]
 
